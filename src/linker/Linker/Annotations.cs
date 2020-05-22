@@ -453,10 +453,10 @@ namespace Mono.Linker
 		{
 			var attributes = GetLinkerAttributes<T> (method);
 			if (attributes.Count () > 1) {
-				context.LogMessage (MessageContainer.CreateWarningMessage (
+				context.LogWarning (
 					$"Attribute '{typeof (T).FullName}' should only be used once on '{method}'.",
 					2027,
-					origin: MessageOrigin.TryGetOrigin (method, 0)));
+					origin: MessageOrigin.TryGetOrigin (method, 0));
 			}
 
 			attribute = attributes.FirstOrDefault ();

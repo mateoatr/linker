@@ -465,8 +465,38 @@ namespace Mono.Linker
 
 		public void LogMessage (MessageContainer message)
 		{
-			if (LogMessages)
-				Logger?.LogMessage (message);
+			if ((message.Category == MessageCategory.Info ||
+				message.Category == MessageCategory.Diagnostic) &&
+				!LogMessages)
+				return;
+
+			Logger?.LogMessage (message);
+		}
+
+		public void LogMessage (string message, bool isDiagnostic = false)
+		{
+			if (!LogMessages)
+				return;
+
+			MessageContainer messageContainer;
+			if (isDiagnostic)
+				messageContainer = MessageContainer.CreateDiagnosticMessage (message);
+			else
+				messageContainer = MessageContainer.CreateInfoMessage (message);
+
+			Logger?.LogMessage (messageContainer);
+		}
+
+		public void LogWarning (string text, int code, string subcategory = MessageSubCategory.None, MessageOrigin? origin = null)
+		{
+			var warning = MessageContainer.CreateWarningMessage (text, code, subcategory, origin);
+			Logger?.LogMessage (warning);
+		}
+
+		public void LogError (string text, int code, string subcategory = MessageSubCategory.None, MessageOrigin? origin = null)
+		{
+			var error = MessageContainer.CreateErrorMessage (text, code, subcategory, origin);
+			Logger?.LogMessage (error);
 		}
 	}
 

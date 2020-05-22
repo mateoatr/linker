@@ -15,7 +15,9 @@ namespace Mono.Linker
 		public TypeDefinition GetType (string fullName) { throw null; }
 		public AssemblyDefinition GetLoadedAssembly (string name) { throw null; }
 
-		public void LogMessage (MessageContainer message) { throw null; }
+		public void LogWarning (string text, int code, string subcategory = "", MessageOrigin? origin = null) { throw null;  }
+		public void LogError (string text, int code, string subcategory = "", MessageOrigin? origin = null) { throw null; }
+
 
 		public bool HasCustomData (string key) { throw null; }
 		public bool TryGetCustomData (string key, out string value) { throw null; }
