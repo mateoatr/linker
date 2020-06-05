@@ -2091,6 +2091,9 @@ namespace Mono.Linker.Steps
 				return null;
 			}
 
+			var fullName = method.FullName;
+			var now = method.GetName ();
+
 			if (Annotations.GetAction (method) == MethodAction.Nothing)
 				Annotations.SetAction (method, MethodAction.Parse);
 
