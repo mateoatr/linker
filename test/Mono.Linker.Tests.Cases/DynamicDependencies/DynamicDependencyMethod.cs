@@ -5,10 +5,10 @@ using Mono.Linker.Tests.Cases.Expectations.Metadata;
 
 namespace Mono.Linker.Tests.Cases.DynamicDependencies
 {
-	[LogContains ("IL2037: Mono.Linker.Tests.Cases.DynamicDependencies.DynamicDependencyMethod/B::Broken(): No members were resolved for 'MissingMethod'.")]
-	[LogContains ("IL2037: Mono.Linker.Tests.Cases.DynamicDependencies.DynamicDependencyMethod/B::Broken(): No members were resolved for 'Dependency2``1(``0,System.Int32,System.Object)'.")]
-	[LogContains ("IL2037: Mono.Linker.Tests.Cases.DynamicDependencies.DynamicDependencyMethod/B::Broken(): No members were resolved for '#ctor()'.")]
-	[LogContains ("IL2037: Mono.Linker.Tests.Cases.DynamicDependencies.DynamicDependencyMethod/B::Broken(): No members were resolved for '#cctor()'.")]
+	[LogContains ("IL2037: Mono.Linker.Tests.Cases.DynamicDependencies.DynamicDependencyMethod.B::Broken(): No members were resolved for 'MissingMethod'.")]
+	[LogContains ("IL2037: Mono.Linker.Tests.Cases.DynamicDependencies.DynamicDependencyMethod.B::Broken(): No members were resolved for 'Dependency2``1(``0,System.Int32,System.Object)'.")]
+	[LogContains ("IL2037: Mono.Linker.Tests.Cases.DynamicDependencies.DynamicDependencyMethod.B::Broken(): No members were resolved for '#ctor()'.")]
+	[LogContains ("IL2037: Mono.Linker.Tests.Cases.DynamicDependencies.DynamicDependencyMethod.B::Broken(): No members were resolved for '#cctor()'.")]
 	class DynamicDependencyMethod
 	{
 		public static void Main ()
@@ -36,12 +36,15 @@ namespace Mono.Linker.Tests.Cases.DynamicDependencies
 			[Kept]
 			[DynamicDependency ("Dependency1()", typeof (C))]
 			[DynamicDependency ("Dependency2``1(``0[],System.Int32", typeof (C))]
+			[DynamicDependency ("Dependency3", typeof (C))]
+			[DynamicDependency ("RecursiveDependency", typeof (C))]
 			[DynamicDependency ("#ctor()", typeof (C))] // To avoid lazy body marking stubbing
 			[DynamicDependency ("field", typeof (C))]
 			[DynamicDependency ("NextOne(Mono.Linker.Tests.Cases.DynamicDependencies.DynamicDependencyMethod.Nested@)", typeof (Nested))]
 			[DynamicDependency ("#cctor()", typeof (Nested))]
 			// Dependency on a property itself should be expressed as a dependency on one or both accessor methods
 			[DynamicDependency ("get_Property()", typeof (C))]
+			[DynamicDependency ("get_Property2", typeof (C))]
 			[DynamicDependency ("M``1(Mono.Linker.Tests.Cases.DynamicDependencies.DynamicDependencyMethod.Complex.S{" +
 				"Mono.Linker.Tests.Cases.DynamicDependencies.DynamicDependencyMethod.Complex.G{" +
 					"Mono.Linker.Tests.Cases.DynamicDependencies.DynamicDependencyMethod.Complex.A,``0}}" +
@@ -135,8 +138,28 @@ namespace Mono.Linker.Tests.Cases.DynamicDependencies
 		}
 
 		[Kept]
+		internal void Dependency3 (string str)
+		{
+		}
+
+		[Kept]
+		[DynamicDependency ("#ctor", typeof (NestedInC))]
+		internal void RecursiveDependency ()
+		{
+		}
+
+		[KeptMember (".ctor()")]
+		class NestedInC
+		{
+		}
+
+		[Kept]
 		[KeptBackingField]
 		internal string Property { [Kept] get; set; }
+
+		[Kept]
+		[KeptBackingField]
+		internal string Property2 { [Kept] get; set; }
 
 		// For now, Condition has no effect: https://github.com/mono/linker/issues/1231
 		[Kept]
