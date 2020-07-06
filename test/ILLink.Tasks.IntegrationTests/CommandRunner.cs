@@ -2,8 +2,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using Xunit;
-using Xunit.Abstractions;
 
 namespace ILLink.Tests
 {
@@ -17,20 +15,10 @@ namespace ILLink.Tests
 			this.logger = logger;
 		}
 
-		public int Dotnet (string args, string workingDir, string additionalPath = null)
+		public bool Dotnet (string args, string workingDir, string additionalPath = null)
 		{
 			return RunCommand (Path.GetFullPath (TestContext.DotnetToolPath), args,
-				workingDir, additionalPath, out _);
-		}
-
-		public int RunCommand (string command, string args, int timeout = Int32.MaxValue)
-		{
-			return RunCommand (command, args, null, null, out _, timeout);
-		}
-
-		public int RunCommand (string command, string args, string workingDir)
-		{
-			return RunCommand (command, args, workingDir, null, out _);
+				workingDir, additionalPath, out _) == 0;
 		}
 
 		public int RunCommand (string command, string args, string workingDir, string additionalPath,
@@ -105,36 +93,31 @@ namespace ILLink.Tests
 
 		public int Run (out string commandOutput)
 		{
-			if (String.IsNullOrEmpty (command)) {
+			if (string.IsNullOrEmpty (command))
 				throw new Exception ("No command was specified specified.");
-			}
-			if (logger == null) {
+
+			if (logger == null)
 				throw new Exception ("No logger present.");
-			}
+
 			var psi = new ProcessStartInfo {
 				FileName = command,
 				UseShellExecute = false,
 				RedirectStandardOutput = true,
 				RedirectStandardError = true,
 			};
-			LogMessage ($"caller working directory: {Environment.CurrentDirectory}");
-			if (!String.IsNullOrEmpty (args)) {
+
+			LogMessage ($"Caller working directory: {Environment.CurrentDirectory}");
+			if (!string.IsNullOrEmpty (args))
 				psi.Arguments = args;
-				LogMessage ($"{command} {args}");
-			} else {
-				LogMessage ($"{command}");
-			}
-			if (!String.IsNullOrEmpty (workingDir)) {
-				LogMessage ($"working directory: {workingDir}");
+
+			LogMessage ($"{command} {args}");
+			if (!string.IsNullOrEmpty (workingDir)) {
 				psi.WorkingDirectory = workingDir;
+				LogMessage ($"Working directory: {workingDir}");
 			}
-			if (!String.IsNullOrEmpty (additionalPath)) {
-				string path = psi.Environment["PATH"];
-				psi.Environment["PATH"] = path + ";" + additionalPath;
-			}
-			var process = new Process {
-				StartInfo = psi
-			};
+
+			if (!string.IsNullOrEmpty (additionalPath))
+				psi.Environment["PATH"] += $";{additionalPath}";
 
 			// dotnet sets some environment variables that
 			// may cause problems in the child process.
@@ -145,10 +128,14 @@ namespace ILLink.Tests
 			psi.Environment.Remove ("CscToolExe");
 			psi.Environment.Remove ("MSBUILD_EXE_PATH");
 
-			LogMessage ("environment:");
-			foreach (var item in psi.Environment) {
+			LogMessage ("Environment:");
+			foreach (var item in psi.Environment)
 				LogMessage ($"\t{item.Key}={item.Value}");
-			}
+
+			// Set process
+			var process = new Process {
+				StartInfo = psi
+			};
 
 			StringBuilder processOutput = new StringBuilder ();
 			void handler (object sender, DataReceivedEventArgs e)
@@ -156,43 +143,43 @@ namespace ILLink.Tests
 				processOutput.Append (e.Data);
 				processOutput.AppendLine ();
 			}
+
 			StringBuilder processError = new StringBuilder ();
 			void ehandler (object sender, DataReceivedEventArgs e)
 			{
 				processError.Append (e.Data);
 				processError.AppendLine ();
 			}
+
 			process.OutputDataReceived += handler;
 			process.ErrorDataReceived += ehandler;
-
-			// terminate process if output contains specified string
-			if (!String.IsNullOrEmpty (terminatingOutput)) {
+			if (!string.IsNullOrEmpty (terminatingOutput)) {
 				void terminatingOutputHandler (object sender, DataReceivedEventArgs e)
 				{
-					if (!String.IsNullOrEmpty (e.Data) && e.Data.Contains (terminatingOutput))
+					if (!string.IsNullOrEmpty (e.Data) && e.Data.Contains (terminatingOutput))
 						process.Kill ();
 				}
+
 				process.OutputDataReceived += terminatingOutputHandler;
 			}
 
-			// start the process
 			process.Start ();
 			process.BeginOutputReadLine ();
 			process.BeginErrorReadLine ();
 			if (!process.WaitForExit (timeout)) {
-				LogMessage ($"killing process after {timeout} ms");
+				LogMessage ($"Killing process after {timeout} ms");
 				process.Kill ();
 			}
+
 			// WaitForExit with timeout doesn't guarantee
 			// that the async output handlers have been
 			// called, so WaitForExit needs to be called
 			// afterwards.
 			process.WaitForExit ();
-			string processOutputStr = processOutput.ToString ();
-			string processErrorStr = processError.ToString ();
-			LogMessage (processOutputStr);
-			LogMessage (processErrorStr);
-			commandOutput = processOutputStr;
+			commandOutput = processOutput.ToString ();
+			LogMessage (commandOutput);
+			LogMessage (processError.ToString ());
+			
 			return process.ExitCode;
 		}
 	}
