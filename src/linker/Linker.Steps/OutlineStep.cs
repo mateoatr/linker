@@ -38,7 +38,7 @@ namespace Mono.Linker.Steps
 					continue;
 				}
 
-				Context.OutlineInstructionsAsStrings.Add (instruction.ToString());
+				Context.OutlineInstructionsAsStrings.Add (instruction.ToString().Substring("IL_XXXX: ".Length - 1));
 				lastInstructionWasInvalid = false;
 			}
 		}
