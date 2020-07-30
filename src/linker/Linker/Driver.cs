@@ -1187,6 +1187,8 @@ namespace Mono.Linker
 			p.AppendStep (new ValidateVirtualMethodAnnotationsStep ());
 			p.AppendStep (new SweepStep ());
 			p.AppendStep (new CodeRewriterStep ());
+			p.AppendStep (new OutlineStep ());
+			p.AppendStep (new OutlineRewriterStep ());
 			p.AppendStep (new CleanStep ());
 			p.AppendStep (new RegenerateGuidStep ());
 			p.AppendStep (new OutputStep ());

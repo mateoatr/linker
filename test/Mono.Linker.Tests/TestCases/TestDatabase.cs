@@ -203,6 +203,11 @@ namespace Mono.Linker.Tests.TestCases
 			return NUnitCasesBySuiteName ("LinkAttributes");
 		}
 
+		public static IEnumerable<TestCaseData> OutliningTests ()
+		{
+			return NUnitCasesBySuiteName ("Outlining");
+		}
+
 		public static TestCaseCollector CreateCollector ()
 		{
 			GetDirectoryPaths (out string rootSourceDirectory, out string testCaseAssemblyPath);

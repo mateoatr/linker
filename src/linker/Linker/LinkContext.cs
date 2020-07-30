@@ -188,6 +188,8 @@ namespace Mono.Linker
 
 		public Tracer Tracer { get; private set; }
 
+		public List<string> OutlineInstructionsAsStrings;
+
 		public IReflectionPatternRecorder ReflectionPatternRecorder { get; set; }
 
 #if !FEATURE_ILLINK
@@ -241,6 +243,7 @@ namespace Mono.Linker
 			GeneralWarnAsError = false;
 			WarnAsError = new Dictionary<uint, bool> ();
 			WarnVersion = WarnVersion.Latest;
+			OutlineInstructionsAsStrings = new List<string> ();
 
 			// See https://github.com/mono/linker/issues/612
 			const CodeOptimizations defaultOptimizations =
