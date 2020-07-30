@@ -1,13 +1,8 @@
 using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Mono.Collections.Generic;
-// using Gma.DataStructures.StringSearch;
-using SuffixTree;
-using System.Collections.Generic;
 
 namespace Mono.Linker.Steps
 {
@@ -22,17 +17,16 @@ namespace Mono.Linker.Steps
 		{
 			// extract the longest repeated subsequence.
 			// using suffix array
-			List<int> longestRepeatedSubstring = Context.SuffixArray.GetLongestRepeatedSubstring();
-			Console.WriteLine("Longest subsequence:");
+			List<int> longestRepeatedSubstring = Context.SuffixArray.GetLongestRepeatedSubstring ();
+			Console.WriteLine ("Longest subsequence:");
 			foreach (int i in longestRepeatedSubstring) {
-				Console.Write(i.ToString("X8"));
-				Console.WriteLine(": " + Context.InstructionMap[i]);
+				Console.Write (i.ToString ("X8"));
+				Console.WriteLine (": " + Context.InstructionMap[i]);
 			}
 		}
 
-		protected override void Process()
+		protected override void Process ()
 		{
-
 			// just put the extracted sequences into corelib for now
 			var targetAsm = Context.Resolve ("System.Private.CoreLib"); // TODO: get this more directly?
 			targetType = new TypeDefinition (
@@ -40,7 +34,6 @@ namespace Mono.Linker.Steps
 				TypeAttributes.NotPublic | TypeAttributes.Sealed // TODO: pick proper TypeAttributes?
 			);
 			targetAsm.MainModule.Types.Add (targetType);
-
 
 			// pretend that we have identified an eligible subsequence to extract.
 			// this hard-codes a known common subsequence in a testcase assembly.
@@ -81,7 +74,7 @@ namespace Mono.Linker.Steps
 			// dedupe identical methods A and B in console test app
 
 			// TODO: debug this. why doesn't getting Object from the targetAsm's typesystem work?
-			var objectType = Context.Resolve("System.Private.CoreLib").FindType("System.Object");
+			var objectType = Context.Resolve ("System.Private.CoreLib").FindType ("System.Object");
 
 #if false
 
@@ -151,7 +144,8 @@ namespace Mono.Linker.Steps
 		void ReplaceOutlinedInstructions (
 			(MethodDefinition method, int start) duplicate,
 			(MethodDefinition method, int start, int end, int nargs) sequence,
-			MethodDefinition outlinedMethod) {
+			MethodDefinition outlinedMethod)
+		{
 
 			// TODO: make this more efficient
 
@@ -172,8 +166,9 @@ namespace Mono.Linker.Steps
 		int intrinsicId = 0;
 
 		// DANGER: assumes a return type of String.
-		MethodDefinition CreateEntireOutlinedMethod(MethodDefinition method) {
-			var targetMethod = new MethodDefinition(
+		MethodDefinition CreateEntireOutlinedMethod (MethodDefinition method)
+		{
+			var targetMethod = new MethodDefinition (
 					intrinsicId.ToString (),
 					MethodAttributes.Public | MethodAttributes.Static,
 					targetType.Module.TypeSystem.String
@@ -205,9 +200,10 @@ namespace Mono.Linker.Steps
 		//   leaves 1 integer on the stack.
 		// The produced method will set up the stack with nargs integers (from method arguments),
 		// and will return the integer left on the stack.
-		MethodDefinition CreateOutlinedMethod((MethodDefinition method, int start, int end, int nargs) sequence) {
+		MethodDefinition CreateOutlinedMethod ((MethodDefinition method, int start, int end, int nargs) sequence)
+		{
 			// create a method to contain the outlined instructions
-			var targetMethod = new MethodDefinition(
+			var targetMethod = new MethodDefinition (
 				intrinsicId.ToString (),
 				MethodAttributes.Public | MethodAttributes.Static, // TODO: pick propert MethodAttributes?
 				targetType.Module.TypeSystem.String // TODO: pick proper return type?
@@ -224,19 +220,20 @@ namespace Mono.Linker.Steps
 				var parameter = new ParameterDefinition (targetType.Module.TypeSystem.Int32);
 				targetMethod.Parameters.Add (parameter);
 				instructions.Add (
-					i switch {
-					0 => Instruction.Create (OpCodes.Ldarg_0),
-					1 => Instruction.Create (OpCodes.Ldarg_1),
-					2 => Instruction.Create (OpCodes.Ldarg_2),
-					3 => Instruction.Create (OpCodes.Ldarg_3),
-					_ => Instruction.Create (OpCodes.Ldarg, parameter),
+					i switch
+					{
+						0 => Instruction.Create (OpCodes.Ldarg_0),
+						1 => Instruction.Create (OpCodes.Ldarg_1),
+						2 => Instruction.Create (OpCodes.Ldarg_2),
+						3 => Instruction.Create (OpCodes.Ldarg_3),
+						_ => Instruction.Create (OpCodes.Ldarg, parameter),
 					}
 				);
 			}
 
 			// copy the outlined subsequence
 			for (int i = sequence.start; i < sequence.end; i++) {
-				instructions.Add (sequence.method.Body.Instructions [i]);
+				instructions.Add (sequence.method.Body.Instructions[i]);
 			}
 
 			// return the integer left on the stack

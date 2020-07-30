@@ -1,22 +1,12 @@
 using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-// using Gma.DataStructures.StringSearch;
-using SuffixTree;
-using SuffixArray;
 using System.Collections.Generic;
 
 namespace Mono.Linker.Steps
 {
 	public class OutlinerStep : BaseStep
 	{
-		SuffixTree.SuffixTree SuffixTree {
-			get => Context.SuffixTree;
-		}
-
 		Dictionary<int, Instruction> InstructionMap {
 			get => Context.InstructionMap;
 		}
@@ -26,7 +16,6 @@ namespace Mono.Linker.Steps
 		protected override void Process ()
 		{
 			Context.InstructionSequence = new List<int> ();
-			Context.SuffixTree = new SuffixTree.SuffixTree ();
 			Context.InstructionMap = new Dictionary<int, Instruction> ();
 			instructionAsInt = new InstructionAsInt ();
 			Context.IdenticalMethods = new Dictionary<int, List<MethodDefinition>> ();
@@ -43,13 +32,21 @@ namespace Mono.Linker.Steps
 
 		void ProcessType (TypeDefinition type)
 		{
-			foreach (var method in type.Methods) {
+			foreach (var method in type.Methods)
 				if (method.HasBody)
 					ProcessMethod (method);
-			}
 
-			foreach (var nested in type.NestedTypes)
-				ProcessType (nested);
+			foreach (var nestedType in type.NestedTypes)
+				ProcessType (nestedType);
+		}
+
+		void ProcessMethod (MethodDefinition method)
+		{
+			if (!IsMethodEligibleForOutlining (method))
+				return;
+
+			// EncodeMethodForSuffixTree (method);
+			TrackMethodHash (method);
 		}
 
 		bool IsInstructionEligibleForOutlining (Instruction instr)
@@ -400,18 +397,13 @@ namespace Mono.Linker.Steps
 			if (method.HasGenericParameters)
 				return false;
 
-			// TODO: some might be eligible, if they don't use generic parameter types
+			// TODO: Some might be eligible, if they don't use generic parameter types
 			if (method.DeclaringType.HasGenericParameters)
 				return false;
 
-			// for now, only look for test methods we define...
-			// if (!(method.ToString ().Contains ("Mono.Linker.Tests.Cases.Outlining") ||
-			// 	method.ToString ().Contains(" console")
-			// ))
-//				return false;
-
 			return true;
 		}
+
 		void EncodeMethodForSuffixTree (MethodDefinition method)
 		{
 			Console.WriteLine("encoding method " + method.ToString());
@@ -445,16 +437,6 @@ namespace Mono.Linker.Steps
 			Console.WriteLine();
 		}
 
-		void ProcessMethod (MethodDefinition method)
-		{
-			if (!IsMethodEligibleForOutlining (method))
-				return;
-
-			// EncodeMethodForSuffixTree (method);
-
-			TrackMethodHash (method);
-		}
-
 		int HashMethodBody (MethodDefinition method)
 		{
 			var hash = HashCode.Combine (method.Body.HasVariables, method.Body.Variables);
@@ -479,6 +461,7 @@ namespace Mono.Linker.Steps
 				methods = new List<MethodDefinition> ();
 				Context.IdenticalMethods [hash] = methods;
 			}
+
 			methods.Add (method);
 		}
 

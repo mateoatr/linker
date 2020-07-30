@@ -1,80 +1,119 @@
-// https://pastebin.com/sHaHPq2v
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SuffixArray
+namespace Mono.Linker
 {
 	public class SuffixArray<T>
 	{
-		private readonly Dictionary<T, int> charRepresentation;
-		private readonly List<int> stringsAsIntegers;
+		private readonly Dictionary<T, int> integerMapping;
+		private readonly List<int> integerRepresentation;
+		private readonly List<T> originalSequence;
+		private bool IsBuilt { get; set; }
+
 		public int[] SortedCyclicShifts;
 		public int[] LongestCommonPrefix;
 
-		public SuffixArray(List<T> s)
+		public SuffixArray (List<T> sequence)
 		{
-			charRepresentation = new Dictionary<T, int>();
-			stringsAsIntegers = new List<int>();
+			integerMapping = new Dictionary<T, int> ();
+			integerRepresentation = new List<int> ();
+			originalSequence = sequence;
+			IsBuilt = false;
+		}
 
-			for (int i = 0; i < s.Count; i++)
-			{
-				if (!charRepresentation.TryGetValue(s[i], out int strRepresentation))
-				{
-					strRepresentation = charRepresentation.Count + 1;
-					charRepresentation[s[i]] = strRepresentation;
+		public List<T> GetLongestNonOverlappingSubsequence (int minimSubsequenceSize = 2)
+		{
+			Build ();
+			int candidateIndex = -1;
+			int candidateLength = 0;
+			for (int i = 1; i < LongestCommonPrefix.Length; i++) {
+				int subsequenceSize = LongestCommonPrefix[i];
+				if (subsequenceSize > LongestCommonPrefix[i - 1]) {
+					// Break if there's overlaps or the substring does not meet the size threshold
+					if (SortedCyclicShifts[i - 1] - SortedCyclicShifts[i] < subsequenceSize ||
+						subsequenceSize < minimSubsequenceSize)
+						continue;
+
+					if (subsequenceSize > candidateLength) {
+						candidateLength = subsequenceSize;
+						candidateIndex = i - 1;
+					}
 				}
-
-				stringsAsIntegers.Add(strRepresentation);
 			}
 
-			Build();
-			BuildLCP();
+			if (candidateIndex == -1)
+				return null;
+
+			return GetSubsequence (candidateIndex, candidateLength);
 		}
 
-		public List<T> GetLongestRepeatedSubstring()
+		public List<T> GetLongestRepeatedSubsequence ()
 		{
-			int longestPrefixSize = LongestCommonPrefix.Max();
-			int longestPrefix = Array.IndexOf(LongestCommonPrefix, longestPrefixSize);
-			// Now we go back from our integer representation to a string...
+			Build ();
+			int longestPrefixSize = LongestCommonPrefix.Max ();
+			int longestPrefix = Array.IndexOf (LongestCommonPrefix, longestPrefixSize);
+			return GetSubsequence (longestPrefix, longestPrefixSize);
+		}
+
+		void Build ()
+		{
+			if (IsBuilt)
+				return;
+
+			for (int i = 0; i < originalSequence.Count; i++) {
+				if (!integerMapping.TryGetValue (originalSequence[i], out int strRepresentation)) {
+					strRepresentation = integerMapping.Count + 1;
+					integerMapping[originalSequence[i]] = strRepresentation;
+				}
+
+				integerRepresentation.Add (strRepresentation);
+			}
+
+			BuildSuffixArray ();
+			BuildLongestCommonPrefixArray ();
+			IsBuilt = true;
+
+			// Remove the terminator
+			SortedCyclicShifts = SortedCyclicShifts.Skip (1).ToArray ();
+			integerRepresentation.RemoveAt (integerRepresentation.Count - 1);
+		}
+
+		List<T> GetSubsequence (int index, int size)
+		{
+			// We go back from our integer representation to a string...
 			// The mapping is bijective so this is fine.
-			var reverseDict = charRepresentation.ToDictionary(k => k.Value, v => v.Key);
-			List<T> longestRepeatedSubstring = new List<T> ();
-			for (int i = SortedCyclicShifts[longestPrefix];
-				i < SortedCyclicShifts[longestPrefix] + longestPrefixSize; i++)
-				longestRepeatedSubstring.Add(reverseDict[stringsAsIntegers[i]]);
+			var reverseDict = integerMapping.ToDictionary (k => k.Value, v => v.Key);
+			List<T> subsequence = new List<T> ();
+			for (int i = SortedCyclicShifts[index];
+				i < SortedCyclicShifts[index] + size; i++)
+				subsequence.Add (reverseDict[integerRepresentation[i]]);
 
-			return longestRepeatedSubstring;
+			return subsequence;
 		}
 
-		/// <summary>
-		/// We can simplify this by defining our comparison function and calling
-		/// Array.Sort on our array of cyclic shifts.
-		/// </summary>
-		void Build()
+		void BuildSuffixArray ()
 		{
-			stringsAsIntegers.Add(0); // This is '$'
-			int alphabetSize = charRepresentation.Count + 1; // Plus one because of '$'
-			int stringSize = stringsAsIntegers.Count; // We will sort the cyclic shifts
+			integerRepresentation.Add (0);
+			int alphabetSize = integerMapping.Count + 1;
+			int stringSize = integerRepresentation.Count;
 			int[] elementCount = new int[Math.Max (alphabetSize, stringSize)];
 			int[] permutations = new int[stringSize];
 			int[] eqClasses = new int[stringSize];
 
 			for (int i = 0; i < stringSize; i++)
-				elementCount[stringsAsIntegers[i]]++;
+				elementCount[integerRepresentation[i]]++;
 
 			for (int i = 1; i < alphabetSize; i++)
 				elementCount[i] += elementCount[i - 1];
 
 			for (int i = 0; i < stringSize; i++)
-				permutations[--elementCount[stringsAsIntegers[i]]] = i;
+				permutations[--elementCount[integerRepresentation[i]]] = i;
 
 			eqClasses[permutations[0]] = 0;
 			int classes = 1;
-			for (int i = 1; i < stringSize; i++)
-			{
-				if (stringsAsIntegers[permutations[i]] != stringsAsIntegers[permutations[i - 1]])
+			for (int i = 1; i < stringSize; i++) {
+				if (integerRepresentation[permutations[i]] != integerRepresentation[permutations[i - 1]])
 					classes++;
 
 				eqClasses[permutations[i]] = classes - 1;
@@ -82,16 +121,14 @@ namespace SuffixArray
 
 			int[] sndPermutation = new int[stringSize];
 			int[] sndEqClasses = new int[stringSize];
-			for (int j = 0; (1 << j) < stringSize; ++j)
-			{
-				for (int i = 0; i < stringSize; i++)
-				{
+			for (int j = 0; (1 << j) < stringSize; ++j) {
+				for (int i = 0; i < stringSize; i++) {
 					sndPermutation[i] = permutations[i] - (1 << j);
 					if (sndPermutation[i] < 0)
 						sndPermutation[i] += stringSize;
 				}
 
-				Array.Fill(elementCount, 0, 0, classes);
+				Array.Fill (elementCount, 0, 0, classes);
 				for (int i = 0; i < stringSize; i++)
 					elementCount[eqClasses[sndPermutation[i]]]++;
 
@@ -103,10 +140,9 @@ namespace SuffixArray
 
 				sndEqClasses[permutations[0]] = 0;
 				classes = 1;
-				for (int i = 1; i < stringSize; i++)
-				{
+				for (int i = 1; i < stringSize; i++) {
 					var currentPair = (eqClasses[permutations[i]], eqClasses[(permutations[i] + (1 << j)) % stringSize]);
-					var previousPair = (eqClasses[permutations[i-1]], eqClasses[(permutations[i-1] + (1 << j)) % stringSize]);
+					var previousPair = (eqClasses[permutations[i - 1]], eqClasses[(permutations[i - 1] + (1 << j)) % stringSize]);
 					if (currentPair != previousPair)
 						classes++;
 
@@ -118,35 +154,28 @@ namespace SuffixArray
 				sndEqClasses = holdMyArray;
 			}
 
-			SortedCyclicShifts = permutations.Skip(1).ToArray();
-			// We are no longer sorting, so remove '$'
-			stringsAsIntegers.RemoveAt(stringSize - 1);
+			SortedCyclicShifts = permutations;
 		}
 
-		/// <summary>
-		/// We reduce LCP to RMQ and use Kasai's algorithm to construct
-		/// LCP in O(n).
-		/// </summary>
-		void BuildLCP()
+		void BuildLongestCommonPrefixArray ()
 		{
-			int size = stringsAsIntegers.Count;
+			int size = integerRepresentation.Count;
 			int[] rank = new int[size];
 			for (int i = 0; i < size; i++)
 				rank[SortedCyclicShifts[i]] = i;
 
 			LongestCommonPrefix = new int[size - 1];
-			for (int i = 0, k = 0; i < size; i++)
-			{
-				if (rank[i] == size - 1)
-				{
+			for (int i = 0, k = 0; i < size; i++) {
+				if (rank[i] == size - 1) {
 					k = 0;
 					continue;
 				}
 
 				int j = SortedCyclicShifts[rank[i] + 1];
-				while (i + k < size &&
+				while (i + k - j > 0 &&
+					i + k < size &&
 					j + k < size &&
-					stringsAsIntegers[i + k] == stringsAsIntegers[j + k])
+					integerRepresentation[i + k] == integerRepresentation[j + k])
 					k++;
 
 				LongestCommonPrefix[rank[i]] = k;
