@@ -73,6 +73,50 @@ the error code. For example:
 
 - Invalid value 'value' was used for command-line option '--generate-warning-suppressions'; must be 'cs' or 'xml'.
 
+#### `IL1018`: Missing argument for '{optionName}' option
+
+- The command-line option 'optionName' was specified but no argument was given.
+
+#### `IL1019`: Value used with '--custom-data' has to be in the KEY=VALUE format
+
+- The command-line option --custom-data receives a key-value pair using the format KEY=VALUE.
+
+#### `IL1020`: No files to link were specified. Use one of '{resolvers}' options
+
+#### `IL1021`: Options '--new-mvid' and '--deterministic' cannot be used at the same time
+
+#### `IL1022`: The assembly '{arg}' specified for '--custom-step' option could not be found
+
+#### `IL1023`: The path to the assembly '{arg}' specified for '--custom-step' must be fully qualified
+
+#### `IL1024`: Invalid value '{arg}' specified for '--custom-step' option
+
+- There was an error in the format of the custom step 'arg' given.
+
+#### `IL1025`: Expected '+' or '-' to control new step insertion
+
+- A custom step that is inserted relative to an existing step in the pipeline must specify whether to be added before (-) or after (+) the step it's relative to.
+
+#### `IL1026`: Pipeline step '{name}' could not be found
+
+- A custom step was specified for insertion relative to a non existent step 'name'.
+
+#### `IL1027`: Custom step '{type}' could not be found
+
+- The custom step 'type' could not be found in the given assembly.
+
+#### `IL1028`: Custom step '{type}' is incompatible with this linker version
+
+#### `IL1029`: Invalid optimization value '{text}'
+
+- The optimization 'text' is invalid. Optimization values can either be 'beforefieldinit', 'overrideremoval', 'unreachablebodies', 'unusedinterfaces', 'ipconstprop', or 'sealer'.
+
+#### `IL1030`: Invalid argument for '{token}' option
+
+#### `IL1031`: "Invalid value 'value' was used as warning code
+
+- All warning codes must start with `IL` prefix followed by numeric code.
+
 ----
 ## Warning Codes
 
@@ -748,7 +792,7 @@ This is technically possible if a custom assembly defines `DynamicDependencyAttr
   </linker>
   ```
 
-#### `IL2050`: Correctness of COM interop cannot be guaranteed
+#### `IL2050`: Trim analysis: Correctness of COM interop cannot be guaranteed
 
 - P/invoke method 'method' declares a parameter with COM marshalling. Correctness of COM interop cannot be guaranteed after trimming. Interfaces and interface members might be removed.
 
@@ -1425,5 +1469,17 @@ This is technically possible if a custom assembly defines `DynamicDependencyAttr
   {
     // IL2095: 'DynamicallyAccessedMemberTypes' in 'DynamicallyAccessedMembersAttribute' on the generic parameter 'T' of method 'Derived.TestMethod<T>' don't match overridden generic parameter 'T' of method 'Base.TestMethod<T>'. All overridden members must have the same 'DynamicallyAccessedMembersAttribute' usage.
     public override void TestMethod<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>() {}
+  }
+  ```
+
+#### `IL2096`: Trim analysis: Call to 'Type.GetType method' can perform case insensitive lookup of the type, currently ILLink can not guarantee presence of all the matching types"
+
+- Specifying a case-insensitive search on an overload of `System.Type.GetType` is not supported by ILLink. Specify false to perform a case-sensitive search or use an overload that does not use a ignoreCase bolean.
+
+  ``` C#
+  void TestMethod()
+  {
+      // IL2096 Trim analysis: Call to 'System.Type.GetType(String,Boolean,Boolean)' can perform case insensitive lookup of the type, currently ILLink can not guarantee presence of all the matching types
+      Type.GetType ("typeName", false, true);
   }
   ```
