@@ -2595,7 +2595,6 @@ namespace Mono.Linker.Steps
 			case DependencyKind.ElementMethod:
 			case DependencyKind.Ldftn:
 			case DependencyKind.Ldvirtftn:
-			case DependencyKind.TriggersCctorForCalledMethod:
 				break;
 
 			// DirectCall, VirtualCall and NewObj are handled by ReflectionMethodBodyScanner

@@ -46,6 +46,7 @@ namespace Mono.Linker.Tests.Cases.RequiresCapability
 			TestTypeWhichOverridesMethodVirtualMethodRequiresUnreferencedCode ();
 			TestTypeWhichOverridesMethodVirtualMethodRequiresUnreferencedCodeOnBase ();
 			TestStaticCctorRequiresUnreferencedCode ();
+			TestCtorRequiresUnreferencedCodeWithAnnotatedCctor ();
 			TestDynamicallyAccessedMembersWithRequiresUnreferencedCode (typeof (DynamicallyAccessedTypeWithRequiresUnreferencedCode));
 			TestDynamicallyAccessedMembersWithRequiresUnreferencedCode (typeof (TypeWhichOverridesMethod));
 			TestInterfaceMethodWithRequiresUnreferencedCode ();
@@ -232,6 +233,26 @@ namespace Mono.Linker.Tests.Cases.RequiresCapability
 		static void TestStaticCctorRequiresUnreferencedCode ()
 		{
 			_ = new StaticCtor ();
+		}
+
+		class CtorAndStaticCtor
+		{
+			[RequiresUnreferencedCode ("Message for --CtorAndStaticCtor.Cctor--")]
+			static CtorAndStaticCtor ()
+			{
+			}
+
+			[RequiresUnreferencedCode ("Message for --CtorAndStaticCtor--")]
+			public CtorAndStaticCtor ()
+			{
+			}
+		}
+
+		[LogDoesNotContain ("--CtorAndStaticCtor.Cctor--")]
+		[RequiresUnreferencedCode ("Message for --CtorAndStaticCtor--")]
+		static void TestCtorRequiresUnreferencedCodeWithAnnotatedCctor ()
+		{
+			_ = new CtorAndStaticCtor ();
 		}
 
 		public class DynamicallyAccessedTypeWithRequiresUnreferencedCode
