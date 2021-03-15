@@ -2911,7 +2911,7 @@ namespace Mono.Linker.Steps
 
 		void ProcessInteropMethod (MethodDefinition method)
 		{
-			if (method.IsPInvokeImpl) {
+			if (method.IsPInvokeImpl && !method.IsNative) {
 				var pii = method.PInvokeInfo;
 				Annotations.MarkProcessed (pii.Module, new DependencyInfo (DependencyKind.InteropMethodDependency, method));
 				if (!string.IsNullOrEmpty (_context.PInvokesListFile)) {
