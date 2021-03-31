@@ -1283,6 +1283,12 @@ namespace Mono.Linker.Steps
 				return;
 			}
 
+			if (at.IsValueType && at.Resolve ().IsEnum) {
+				MarkType (at, new DependencyInfo (DependencyKind.CustomAttributeArgumentType, ca), sourceLocationMember);
+				MarkingHelpers.MarkForwardedScope (at);
+				return;
+			}
+
 			if (at.Namespace == "System") {
 				switch (at.Name) {
 				case "Type":

@@ -14,6 +14,7 @@
     <Compile Remove="LinkXml\Dependencies\UsedNonRequiredExportedTypeIsKept_fwd.cs" />
     <Compile Remove="LinkXml\Dependencies\UsedNonRequiredExportedTypeIsKeptWhenRooted_fwd.cs" />
     <Compile Remove="TypeForwarding\Dependencies\AnotherLibraryForwarder.cs" />
+    <Compile Remove="TypeForwarding\Dependencies\EnumForwarder.cs" />
     <Compile Remove="TypeForwarding\Dependencies\ForwarderLibrary.cs" />
     <Compile Remove="TypeForwarding\Dependencies\ForwarderLibrary_2.cs" />
     <Compile Remove="TypeForwarding\Dependencies\ForwarderLibrary_3.cs" />
@@ -33,6 +34,7 @@
     <Content Include="Attributes\OnlyKeepUsed\Dependencies\UnusedAttributeWithTypeForwarderIsRemoved_Forwarder.cs" />
     <Content Include="LinkXml\Dependencies\CanPreserveAnExportedType_Forwarder.cs" />
     <Content Include="TypeForwarding\Dependencies\ForwarderLibrary.cs" />
+    <Content Include="TypeForwarding\Dependencies\EnumForwarder.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="TypeForwarding\Dependencies\TypeForwarderMissingReference.il" />
