@@ -267,7 +267,7 @@ namespace Mono.Linker.Tests.TestCases
 
 		protected virtual void Run (TestCase testCase)
 		{
-			var runner = new TestRunner (new ObjectFactory ());
+			var runner = new TestRunner ();
 			var linkedResult = runner.Run (testCase);
 			new ResultChecker ().Check (linkedResult);
 		}

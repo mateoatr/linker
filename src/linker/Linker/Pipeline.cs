@@ -152,6 +152,16 @@ namespace Mono.Linker
 			}
 		}
 
+		public void RemoveCurrentStep ()
+		{
+			if (_steps.Count <= 0)
+				throw new LinkerFatalErrorException (
+					MessageContainer.CreateCustomErrorMessage ("ABC", 1111),
+					new IndexOutOfRangeException ());
+
+			_steps.RemoveAt (0);
+		}
+
 		public void Process (LinkContext context)
 		{
 			while (_steps.Count > 0) {
@@ -169,6 +179,14 @@ namespace Mono.Linker
 		public IStep[] GetSteps ()
 		{
 			return _steps.ToArray ();
+		}
+
+		public IStep GetCurrentStep ()
+		{
+			if (_steps.Count > 0)
+				return _steps[0];
+
+			return null;
 		}
 
 		public void InitializeMarkHandlers (LinkContext context, MarkContext markContext)

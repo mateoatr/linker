@@ -236,7 +236,7 @@ namespace Mono.Linker.Tests.TestCases
 
 		protected virtual LinkedTestCaseResult Run (TestCase testCase, out TestRunner runner)
 		{
-			runner = new TestRunner (new ObjectFactory ());
+			runner = new TestRunner ();
 			return runner.Run (testCase);
 		}
 	}

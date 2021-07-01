@@ -12,9 +12,9 @@ namespace Mono.Linker.Tests.TestCasesRunner
 	{
 		private readonly ObjectFactory _factory;
 
-		public TestRunner (ObjectFactory factory)
+		public TestRunner ()
 		{
-			_factory = factory;
+			_factory = new ObjectFactory ();
 		}
 
 		public virtual LinkedTestCaseResult Run (TestCase testCase)

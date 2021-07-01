@@ -37,3 +37,4 @@ artifacts
 *.binlog
 
 test/Mono.Linker.Tests/TestResults.xml
+test/Mono.Linker.Tests.Benchmarks/BenchmarkDotNet*
