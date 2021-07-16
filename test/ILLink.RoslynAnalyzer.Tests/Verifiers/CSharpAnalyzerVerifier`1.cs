@@ -313,8 +313,7 @@ namespace ILLink.RoslynAnalyzer.Tests
 					if (location == Location.None || !location.IsInSource) {
 						builder.Append ($"new DiagnosticResult({rule})");
 					} else {
-						var resultMethodName = location.SourceTree!.FilePath.EndsWith (".cs") ? "VerifyCS.Diagnostic" : "VerifyVB.Diagnostic";
-						builder.Append ($"{resultMethodName}({rule})");
+						builder.Append ($"VerifyCS.Diagnostic({rule})");
 					}
 				} else {
 					builder.Append (
