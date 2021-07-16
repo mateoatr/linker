@@ -77,16 +77,9 @@ namespace ILLink.RoslynAnalyzer
 
 		private protected override DiagnosticDescriptor RequiresAttributeMismatch => s_requiresAttributeMismatch;
 
-		protected override bool IsAnalyzerEnabled (AnalyzerOptions options, Compilation compilation)
-		{
-			var isSingleFileAnalyzerEnabled = options.GetMSBuildPropertyValue (MSBuildPropertyOptionNames.EnableSingleFileAnalyzer, compilation);
-			if (!string.Equals (isSingleFileAnalyzerEnabled?.Trim (), "true", StringComparison.OrdinalIgnoreCase))
-				return false;
-			var includesAllContent = options.GetMSBuildPropertyValue (MSBuildPropertyOptionNames.IncludeAllContentForSelfExtract, compilation);
-			if (string.Equals (includesAllContent?.Trim (), "true", StringComparison.OrdinalIgnoreCase))
-				return false;
-			return true;
-		}
+		protected override bool IsAnalyzerEnabled (AnalyzerOptions options, Compilation compilation) =>
+			options.MSBuildPropertyValueIsTrue (MSBuildPropertyOptionNames.EnableSingleFileAnalyzer, compilation) &&
+			!options.MSBuildPropertyValueIsTrue (MSBuildPropertyOptionNames.IncludeAllContentForSelfExtract, compilation);
 
 		protected override ImmutableArray<ISymbol> GetSpecialIncompatibleMembers (Compilation compilation)
 		{

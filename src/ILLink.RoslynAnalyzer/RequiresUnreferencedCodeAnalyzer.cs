@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System;
 using System.Collections.Immutable;
 using ILLink.Shared;
 using Microsoft.CodeAnalysis;
@@ -21,9 +20,9 @@ namespace ILLink.RoslynAnalyzer
 		static readonly DiagnosticDescriptor s_requiresUnreferencedCodeRule = new DiagnosticDescriptor (
 			IL2026,
 			new LocalizableResourceString (nameof (SharedStrings.RequiresUnreferencedCodeTitle),
-			SharedStrings.ResourceManager, typeof (SharedStrings)),
+				SharedStrings.ResourceManager, typeof (SharedStrings)),
 			new LocalizableResourceString (nameof (SharedStrings.RequiresUnreferencedCodeMessage),
-			SharedStrings.ResourceManager, typeof (SharedStrings)),
+				SharedStrings.ResourceManager, typeof (SharedStrings)),
 			DiagnosticCategory.Trimming,
 			DiagnosticSeverity.Warning,
 			isEnabledByDefault: true);
@@ -31,9 +30,9 @@ namespace ILLink.RoslynAnalyzer
 		static readonly DiagnosticDescriptor s_requiresAttributeMismatch = new DiagnosticDescriptor (
 			IL2046,
 			new LocalizableResourceString (nameof (SharedStrings.RequiresAttributeMismatchTitle),
-			SharedStrings.ResourceManager, typeof (SharedStrings)),
+				SharedStrings.ResourceManager, typeof (SharedStrings)),
 			new LocalizableResourceString (nameof (SharedStrings.RequiresAttributeMismatchMessage),
-			SharedStrings.ResourceManager, typeof (SharedStrings)),
+				SharedStrings.ResourceManager, typeof (SharedStrings)),
 			DiagnosticCategory.Trimming,
 			DiagnosticSeverity.Warning,
 			isEnabledByDefault: true);
@@ -50,13 +49,8 @@ namespace ILLink.RoslynAnalyzer
 
 		private protected override DiagnosticDescriptor RequiresAttributeMismatch => s_requiresAttributeMismatch;
 
-		protected override bool IsAnalyzerEnabled (AnalyzerOptions options, Compilation compilation)
-		{
-			var isTrimAnalyzerEnabled = options.GetMSBuildPropertyValue (MSBuildPropertyOptionNames.EnableTrimAnalyzer, compilation);
-			if (!string.Equals (isTrimAnalyzerEnabled?.Trim (), "true", StringComparison.OrdinalIgnoreCase))
-				return false;
-			return true;
-		}
+		protected override bool IsAnalyzerEnabled (AnalyzerOptions options, Compilation compilation) =>
+			options.MSBuildPropertyValueIsTrue (MSBuildPropertyOptionNames.EnableTrimAnalyzer, compilation);
 
 		protected override bool VerifyAttributeArguments (AttributeData attribute) =>
 			attribute.ConstructorArguments.Length >= 1 && attribute.ConstructorArguments[0] is { Type: { SpecialType: SpecialType.System_String } } ctorArg;
