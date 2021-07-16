@@ -20,7 +20,7 @@ namespace ILLink.RoslynAnalyzer.Tests
 			await VerifyCS.VerifyAnalyzerAsync (source, TestCaseUtils.UseMSBuildProperties (MSBuildPropertyOptionNames.EnableTrimAnalyzer), null, expected);
 
 		[Fact]
-		public Task DynamicTypeInvokation ()
+		public Task InvocationOnDynamicType ()
 		{
 			var source = @"
 using System;
