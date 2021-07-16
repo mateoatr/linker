@@ -19,11 +19,11 @@ namespace ILLink.CodeFix
 	public class RequiresUnreferencedCodeCodeFixProvider : BaseAttributeCodeFixProvider
 	{
 		public sealed override ImmutableArray<string> FixableDiagnosticIds
-			=> ImmutableArray.Create (RequiresUnreferencedCodeAnalyzer.IL2026);
+			=> ImmutableArray.Create (Constants.WarningCodes.IL2026);
 
 		private protected override LocalizableString CodeFixTitle => new LocalizableResourceString (nameof (Resources.RequiresUnreferencedCodeCodeFixTitle), Resources.ResourceManager, typeof (Resources));
 
-		private protected override string FullyQualifiedAttributeName => RequiresUnreferencedCodeAnalyzer.FullyQualifiedRequiresUnreferencedCodeAttribute;
+		private protected override string FullyQualifiedAttributeName => Constants.FullyQualifiedRequiresUnreferencedCodeAttribute;
 
 		private protected override AttributeableParentTargets AttributableParentTargets => AttributeableParentTargets.MethodOrConstructor;
 

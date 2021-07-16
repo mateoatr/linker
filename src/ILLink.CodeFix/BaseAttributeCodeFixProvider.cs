@@ -72,6 +72,7 @@ namespace ILLink.CodeFix
 			if (semanticModel is null) {
 				return document;
 			}
+
 			var newAttribute = generator
 				.Attribute (generator.TypeExpression (AttributeSymbol), attrArgs)
 				.WithAdditionalAnnotations (

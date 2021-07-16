@@ -56,5 +56,25 @@ class C
 				// (26,3): warning IL2026: Invoking members on dynamic types is not trimming safe. Types or member might have been removed by the trimmer.
 				VerifyCS.Diagnostic ().WithSpan (25, 3, 25, 33));
 		}
+
+		[Fact]
+		public Task InvocationOnDynamicTypeInMethodWithRUCDoesNotWarnTwoTimes ()
+		{
+			var source = @"
+using System;
+using System.Diagnostics.CodeAnalysis;
+
+class C
+{
+	[RequiresUnreferencedCode (""We should only see the warning related to this annotation, and none about the dynamic type."")]
+	static void M0 ()
+	{
+		dynamic dynamicField = ""Some string"";
+		Console.WriteLine (dynamicField);
+	}
+}";
+
+			return VerifyDynamicTypeAnalyzer (source);
+		}
 	}
 }

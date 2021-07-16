@@ -19,11 +19,11 @@ namespace ILLink.CodeFix
 	public class RequiresAssemblyFilesCodeFixProvider : BaseAttributeCodeFixProvider
 	{
 		public sealed override ImmutableArray<string> FixableDiagnosticIds
-			=> ImmutableArray.Create (RequiresAssemblyFilesAnalyzer.IL3000, RequiresAssemblyFilesAnalyzer.IL3001, RequiresAssemblyFilesAnalyzer.IL3002);
+			=> ImmutableArray.Create (Constants.WarningCodes.IL3000, Constants.WarningCodes.IL3001, Constants.WarningCodes.IL3002);
 
 		private protected override LocalizableString CodeFixTitle => new LocalizableResourceString (nameof (Resources.RequiresAssemblyFilesCodeFixTitle), Resources.ResourceManager, typeof (Resources));
 
-		private protected override string FullyQualifiedAttributeName => RequiresAssemblyFilesAnalyzer.RequiresAssemblyFilesAttributeFullyQualifiedName;
+		private protected override string FullyQualifiedAttributeName => Constants.RequiresAssemblyFilesAttributeFullyQualifiedName;
 
 		private protected override AttributeableParentTargets AttributableParentTargets => AttributeableParentTargets.MethodOrConstructor | AttributeableParentTargets.Property | AttributeableParentTargets.Event;
 

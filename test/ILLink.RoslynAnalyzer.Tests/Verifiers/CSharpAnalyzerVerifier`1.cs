@@ -234,7 +234,7 @@ namespace ILLink.RoslynAnalyzer.Tests
 				var applicableAnalyzer = analyzers.FirstOrDefault (a => a.SupportedDiagnostics.Any (dd => dd.Id == diagnosticsId));
 				if (applicableAnalyzer != null) {
 					var analyzerType = applicableAnalyzer.GetType ();
-					var rule = diagnostics[i].HasLocation && applicableAnalyzer.SupportedDiagnostics.Length == 1 ? string.Empty : $"{analyzerType.Name}.{diagnosticsId}";
+					var rule = diagnostics[i].HasLocation && applicableAnalyzer.SupportedDiagnostics.Length == 1 ? string.Empty : $"Constants.WarningCodes.{diagnosticsId}";
 
 					if (!diagnostics[i].HasLocation) {
 						builder.Append ($"new DiagnosticResult({rule})");

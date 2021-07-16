@@ -17,7 +17,7 @@ namespace ILLink.RoslynAnalyzer
 			ImmutableArray.Create (s_dynamicTypeInvocationRule);
 
 		static readonly DiagnosticDescriptor s_dynamicTypeInvocationRule = new DiagnosticDescriptor (
-			"IL2026",
+			Constants.WarningCodes.IL2026,
 			new LocalizableResourceString (nameof (SharedStrings.DynamicTypeInvocationTitle),
 				SharedStrings.ResourceManager, typeof (SharedStrings)),
 			new LocalizableResourceString (nameof (SharedStrings.DynamicTypeInvocationMessage),
@@ -37,6 +37,10 @@ namespace ILLink.RoslynAnalyzer
 
 				context.RegisterOperationAction (operationContext => {
 					var dynamicTypeInvocation = (IDynamicInvocationOperation) operationContext.Operation;
+					if (operationContext.GetContainingSymbol (DiagnosticTargets.All) is ISymbol containingSymbol &&
+						containingSymbol.HasAttribute (Constants.RequiresUnreferencedCodeAttribute))
+						return;
+
 					operationContext.ReportDiagnostic (Diagnostic.Create (s_dynamicTypeInvocationRule,
 						dynamicTypeInvocation.Syntax.GetLocation ()));
 				}, OperationKind.DynamicInvocation);

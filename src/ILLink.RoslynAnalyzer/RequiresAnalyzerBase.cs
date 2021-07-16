@@ -26,7 +26,7 @@ namespace ILLink.RoslynAnalyzer
 
 		public override void Initialize (AnalysisContext context)
 		{
-			context.EnableConcurrentExecution ();
+			//context.EnableConcurrentExecution ();
 			context.ConfigureGeneratedCodeAnalysis (GeneratedCodeAnalysisFlags.ReportDiagnostics);
 			context.RegisterCompilationStartAction (context => {
 				var compilation = context.Compilation;
@@ -126,15 +126,18 @@ namespace ILLink.RoslynAnalyzer
 					ISymbol member,
 					ImmutableArray<ISymbol> incompatibleMembers)
 				{
-					ISymbol containingSymbol = FindContainingSymbol (operationContext, AnalyzerDiagnosticTargets);
+					ISymbol containingSymbol = operationContext.GetContainingSymbol (AnalyzerDiagnosticTargets);
 
 					// Do not emit any diagnostic if caller is annotated with the attribute too.
 					if (containingSymbol.HasAttribute (RequiresAttributeName))
 						return;
+
 					// Check also for RequiresAttribute in the associated symbol
-					if (containingSymbol is IMethodSymbol methodSymbol && methodSymbol.AssociatedSymbol is not null && methodSymbol.AssociatedSymbol!.HasAttribute (RequiresAttributeName)) {
+					if (containingSymbol is IMethodSymbol methodSymbol &&
+						methodSymbol.AssociatedSymbol is not null &&
+						methodSymbol.AssociatedSymbol!.HasAttribute (RequiresAttributeName))
 						return;
-					}
+
 					// If calling an instance constructor, check first for any static constructor since it will be called implicitly
 					if (member.ContainingType is { } containingType && operationContext.Operation is IObjectCreationOperation)
 						CheckStaticConstructors (operationContext, containingType.StaticConstructors);
@@ -180,45 +183,6 @@ namespace ILLink.RoslynAnalyzer
 
 				}
 			});
-		}
-
-		[Flags]
-		protected enum DiagnosticTargets
-		{
-			MethodOrConstructor = 0x0001,
-			Property = 0x0002,
-			Field = 0x0004,
-			Event = 0x0008,
-			All = MethodOrConstructor | Property | Field | Event
-		}
-
-		/// <summary>
-		/// Finds the symbol of the caller to the current operation, helps to find out the symbol in cases where the operation passes
-		/// through a lambda or a local function.
-		/// </summary>
-		/// <param name="operationContext">Analyzer operation context to retrieve the current operation.</param>
-		/// <param name="targets">Scope of the attribute to search for callers.</param>
-		/// <returns>The symbol of the caller to the operation</returns>
-		private static ISymbol FindContainingSymbol (OperationAnalysisContext operationContext, DiagnosticTargets targets)
-		{
-			var parent = operationContext.Operation.Parent;
-			while (parent is not null) {
-				switch (parent) {
-				case IAnonymousFunctionOperation lambda:
-					return lambda.Symbol;
-				case ILocalFunctionOperation local when targets.HasFlag (DiagnosticTargets.MethodOrConstructor):
-					return local.Symbol;
-				case IMethodBodyBaseOperation when targets.HasFlag (DiagnosticTargets.MethodOrConstructor):
-				case IPropertyReferenceOperation when targets.HasFlag (DiagnosticTargets.Property):
-				case IFieldReferenceOperation when targets.HasFlag (DiagnosticTargets.Field):
-				case IEventReferenceOperation when targets.HasFlag (DiagnosticTargets.Event):
-					return operationContext.ContainingSymbol;
-				default:
-					parent = parent.Parent;
-					break;
-				}
-			}
-			return operationContext.ContainingSymbol;
 		}
 
 		/// <summary>
@@ -275,6 +239,7 @@ namespace ILLink.RoslynAnalyzer
 					return true;
 				}
 			}
+
 			return false;
 		}
 
