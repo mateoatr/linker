@@ -65,7 +65,7 @@ class C
 }";
 			return VerifyRequiresUnreferencedCodeAnalyzer (TestRequiresWithMessageOnlyOnMethod,
 				// (8,17): warning IL2026: Using method 'C.M1()' which has `RequiresUnreferencedCodeAttribute` can break functionality when trimming application code. message.
-				VerifyCS.Diagnostic (Constants.WarningCodes.IL2026).WithSpan (8, 17, 8, 21).WithArguments ("C.M1()", " message.", ""));
+				VerifyCS.Diagnostic (RequiresUnreferencedCodeAnalyzer.RequiresUnreferencedCodeRule).WithSpan (8, 17, 8, 21).WithArguments ("C.M1()", " message.", ""));
 		}
 
 		[Fact]
@@ -133,13 +133,13 @@ public class E
 
 			await VerifyRequiresUnreferencedCodeCodeFix (test, fixtest, new[] {
 	// /0/Test0.cs(9,17): warning IL2026: Using method 'C.M1()' which has 'RequiresUnreferencedCodeAttribute' can break functionality when trimming application code. message.
-	VerifyCS.Diagnostic (Constants.WarningCodes.IL2026).WithSpan (9, 17, 9, 21).WithArguments ("C.M1()", " message.", ""),
+	VerifyCS.Diagnostic (RequiresUnreferencedCodeAnalyzer.RequiresUnreferencedCodeRule).WithSpan (9, 17, 9, 21).WithArguments ("C.M1()", " message.", ""),
 	// /0/Test0.cs(13,27): warning IL2026: Using method 'C.M1()' which has 'RequiresUnreferencedCodeAttribute' can break functionality when trimming application code. message.
-	VerifyCS.Diagnostic(Constants.WarningCodes.IL2026).WithSpan(13, 27, 13, 33).WithArguments("C.M1()", " message.", ""),
+	VerifyCS.Diagnostic(RequiresUnreferencedCodeAnalyzer.RequiresUnreferencedCodeRule).WithSpan(13, 27, 13, 33).WithArguments("C.M1()", " message.", ""),
 	// /0/Test0.cs(17,31): warning IL2026: Using method 'C.M1()' which has 'RequiresUnreferencedCodeAttribute' can break functionality when trimming application code. message.
-	VerifyCS.Diagnostic (Constants.WarningCodes.IL2026).WithSpan (17, 31, 17, 37).WithArguments ("C.M1()", " message.", ""),
+	VerifyCS.Diagnostic (RequiresUnreferencedCodeAnalyzer.RequiresUnreferencedCodeRule).WithSpan (17, 31, 17, 37).WithArguments ("C.M1()", " message.", ""),
 	// /0/Test0.cs(24,31): warning IL2026: Using method 'C.M1()' which has 'RequiresUnreferencedCodeAttribute' can break functionality when trimming application code. message.
-	VerifyCS.Diagnostic (Constants.WarningCodes.IL2026).WithSpan (24, 31, 24, 37).WithArguments ("C.M1()", " message.", "")
+	VerifyCS.Diagnostic (RequiresUnreferencedCodeAnalyzer.RequiresUnreferencedCodeRule).WithSpan (24, 31, 24, 37).WithArguments ("C.M1()", " message.", "")
 			}, new[] {
 	// /0/Test0.cs(27,10): error CS7036: There is no argument given that corresponds to the required formal parameter 'message' of 'RequiresUnreferencedCodeAttribute.RequiresUnreferencedCodeAttribute(string)'
 	DiagnosticResult.CompilerError("CS7036").WithSpan(27, 10, 27, 36).WithArguments("message", "System.Diagnostics.CodeAnalysis.RequiresUnreferencedCodeAttribute.RequiresUnreferencedCodeAttribute(string)"),
@@ -185,7 +185,7 @@ public class C
 				fix,
 				baselineExpected: new[] {
 					// /0/Test0.cs(12,22): warning IL2026: Using method 'C.M1()' which has 'RequiresUnreferencedCodeAttribute' can break functionality when trimming application code. message.
-					VerifyCS.Diagnostic(Constants.WarningCodes.IL2026).WithSpan(12, 22, 12, 26).WithArguments("C.M1()", " message.", "")
+					VerifyCS.Diagnostic(RequiresUnreferencedCodeAnalyzer.RequiresUnreferencedCodeRule).WithSpan(12, 22, 12, 26).WithArguments("C.M1()", " message.", "")
 				},
 				fixedExpected: Array.Empty<DiagnosticResult> ());
 		}
@@ -230,7 +230,7 @@ public class C
 				fix,
 				baselineExpected: new[] {
 					// /0/Test0.cs(12,28): warning IL2026: Using method 'C.M1()' which has 'RequiresUnreferencedCodeAttribute' can break functionality when trimming application code. message.
-					VerifyCS.Diagnostic(Constants.WarningCodes.IL2026).WithSpan(12, 28, 12, 32).WithArguments("C.M1()", " message.", "")
+					VerifyCS.Diagnostic(RequiresUnreferencedCodeAnalyzer.RequiresUnreferencedCodeRule).WithSpan(12, 28, 12, 32).WithArguments("C.M1()", " message.", "")
 				},
 				fixedExpected: Array.Empty<DiagnosticResult> (),
 				// The default iterations for the codefix is the number of diagnostics (1 in this case)
@@ -271,7 +271,7 @@ public class C
 				fix,
 				baselineExpected: new[] {
 					// /0/Test0.cs(10,19): warning IL2026: Using method 'C.M1()' which has 'RequiresUnreferencedCodeAttribute' can break functionality when trimming application code. message.
-					VerifyCS.Diagnostic(Constants.WarningCodes.IL2026).WithSpan(10, 19, 10, 23).WithArguments("C.M1()", " message.", "")
+					VerifyCS.Diagnostic(RequiresUnreferencedCodeAnalyzer.RequiresUnreferencedCodeRule).WithSpan(10, 19, 10, 23).WithArguments("C.M1()", " message.", "")
 				},
 				fixedExpected: new[] {
 					// /0/Test0.cs(10,6): error CS7036: There is no argument given that corresponds to the required formal parameter 'message' of 'RequiresUnreferencedCodeAttribute.RequiresUnreferencedCodeAttribute(string)'
@@ -310,11 +310,11 @@ public class C
 				fix,
 				baselineExpected: new[] {
 					// /0/Test0.cs(10,15): warning IL2026: Using method 'C.M1()' which has 'RequiresUnreferencedCodeAttribute' can break functionality when trimming application code. message.
-					VerifyCS.Diagnostic(Constants.WarningCodes.IL2026).WithSpan(10, 15, 10, 19).WithArguments("C.M1()", " message.", "")
+					VerifyCS.Diagnostic(RequiresUnreferencedCodeAnalyzer.RequiresUnreferencedCodeRule).WithSpan(10, 15, 10, 19).WithArguments("C.M1()", " message.", "")
 				},
 				fixedExpected: new[] {
 					// /0/Test0.cs(10,15): warning IL2026: Using method 'C.M1()' which has 'RequiresUnreferencedCodeAttribute' can break functionality when trimming application code. message.
-					VerifyCS.Diagnostic(Constants.WarningCodes.IL2026).WithSpan(10, 15, 10, 19).WithArguments("C.M1()", " message.", "")
+					VerifyCS.Diagnostic(RequiresUnreferencedCodeAnalyzer.RequiresUnreferencedCodeRule).WithSpan(10, 15, 10, 19).WithArguments("C.M1()", " message.", "")
 				});
 		}
 
@@ -337,7 +337,7 @@ class C
 }";
 			return VerifyRequiresUnreferencedCodeAnalyzer (MessageAndUrlOnMethod,
 				// (8,3): warning IL2026: Using method 'C.RequiresWithMessageAndUrl()' which has `RequiresUnreferencedCodeAttribute` can break functionality when trimming application code. Message for --RequiresWithMessageAndUrl--. https://helpurl
-				VerifyCS.Diagnostic (Constants.WarningCodes.IL2026).WithSpan (8, 3, 8, 31).WithArguments ("C.RequiresWithMessageAndUrl()", " Message for --RequiresWithMessageAndUrl--.", " https://helpurl")
+				VerifyCS.Diagnostic (RequiresUnreferencedCodeAnalyzer.RequiresUnreferencedCodeRule).WithSpan (8, 3, 8, 31).WithArguments ("C.RequiresWithMessageAndUrl()", " Message for --RequiresWithMessageAndUrl--.", " https://helpurl")
 				);
 		}
 
@@ -367,8 +367,8 @@ class C
 }";
 
 			return VerifyRequiresUnreferencedCodeAnalyzer (source,
-				VerifyCS.Diagnostic (Constants.WarningCodes.IL2026).WithSpan (18, 3, 18, 34).WithArguments ("C.MessageWithoutTrailingPeriod()", " Warning message.", string.Empty),
-				VerifyCS.Diagnostic (Constants.WarningCodes.IL2026).WithSpan (19, 3, 19, 31).WithArguments ("C.MessageWithTrailingPeriod()", " Warning message.", string.Empty));
+				VerifyCS.Diagnostic (RequiresUnreferencedCodeAnalyzer.RequiresUnreferencedCodeRule).WithSpan (18, 3, 18, 34).WithArguments ("C.MessageWithoutTrailingPeriod()", " Warning message.", string.Empty),
+				VerifyCS.Diagnostic (RequiresUnreferencedCodeAnalyzer.RequiresUnreferencedCodeRule).WithSpan (19, 3, 19, 31).WithArguments ("C.MessageWithTrailingPeriod()", " Warning message.", string.Empty));
 		}
 
 		[Fact]
@@ -391,7 +391,7 @@ class C
 }";
 			return VerifyRequiresUnreferencedCodeAnalyzer (PropertyRequires,
 				// (8,7): warning IL2026: Using method 'C.PropertyRequires.get' which has `RequiresUnreferencedCodeAttribute` can break functionality when trimming application code. Message for --getter PropertyRequires--.
-				VerifyCS.Diagnostic (Constants.WarningCodes.IL2026).WithSpan (8, 7, 8, 23).WithArguments ("C.PropertyRequires.get", " Message for --getter PropertyRequires--.", "")
+				VerifyCS.Diagnostic (RequiresUnreferencedCodeAnalyzer.RequiresUnreferencedCodeRule).WithSpan (8, 7, 8, 23).WithArguments ("C.PropertyRequires.get", " Message for --getter PropertyRequires--.", "")
 				);
 		}
 
@@ -415,7 +415,7 @@ class C
 }";
 			return VerifyRequiresUnreferencedCodeAnalyzer (PropertyRequires,
 				// (8,3): warning IL2026: Using method 'C.PropertyRequires.set' which has `RequiresUnreferencedCodeAttribute` can break functionality when trimming application code. Message for --setter PropertyRequires--.
-				VerifyCS.Diagnostic (Constants.WarningCodes.IL2026).WithSpan (8, 3, 8, 19).WithArguments ("C.PropertyRequires.set", " Message for --setter PropertyRequires--.", "")
+				VerifyCS.Diagnostic (RequiresUnreferencedCodeAnalyzer.RequiresUnreferencedCodeRule).WithSpan (8, 3, 8, 19).WithArguments ("C.PropertyRequires.set", " Message for --setter PropertyRequires--.", "")
 				);
 		}
 
@@ -439,7 +439,7 @@ class StaticCtor
 }";
 			return VerifyRequiresUnreferencedCodeAnalyzer (src,
 				// (13,7): warning IL2026: Using method 'StaticCtor.StaticCtor()' which has 'RequiresUnreferencedCodeAttribute' can break functionality when trimming application code. Message for --TestStaticCtor--.
-				VerifyCS.Diagnostic (Constants.WarningCodes.IL2026).WithSpan (13, 7, 13, 24).WithArguments ("StaticCtor.StaticCtor()", " Message for --TestStaticCtor--.", "")
+				VerifyCS.Diagnostic (RequiresUnreferencedCodeAnalyzer.RequiresUnreferencedCodeRule).WithSpan (13, 7, 13, 24).WithArguments ("StaticCtor.StaticCtor()", " Message for --TestStaticCtor--.", "")
 				);
 		}
 
@@ -468,7 +468,7 @@ class C
 }";
 			return VerifyRequiresUnreferencedCodeAnalyzer (src,
 				// (18,11): warning IL2026: Using method 'StaticCtorTriggeredByFieldAccess.StaticCtorTriggeredByFieldAccess()' which has 'RequiresUnreferencedCodeAttribute' can break functionality when trimming application code. Message for --StaticCtorTriggeredByFieldAccess.Cctor--.
-				VerifyCS.Diagnostic (Constants.WarningCodes.IL2026).WithSpan (18, 11, 18, 49).WithArguments ("StaticCtorTriggeredByFieldAccess.StaticCtorTriggeredByFieldAccess()", " Message for --StaticCtorTriggeredByFieldAccess.Cctor--.", "")
+				VerifyCS.Diagnostic (RequiresUnreferencedCodeAnalyzer.RequiresUnreferencedCodeRule).WithSpan (18, 11, 18, 49).WithArguments ("StaticCtorTriggeredByFieldAccess.StaticCtorTriggeredByFieldAccess()", " Message for --StaticCtorTriggeredByFieldAccess.Cctor--.", "")
 				);
 		}
 
@@ -500,9 +500,9 @@ class C
 }";
 			return VerifyRequiresUnreferencedCodeAnalyzer (src,
 				// (21,3): warning IL2026: Using method 'StaticCtorTriggeredByMethodCall.TriggerStaticCtorMarking()' which has 'RequiresUnreferencedCodeAttribute' can break functionality when trimming application code. Message for --StaticCtorTriggeredByMethodCall.TriggerStaticCtorMarking--.
-				VerifyCS.Diagnostic (Constants.WarningCodes.IL2026).WithSpan (21, 3, 21, 69).WithArguments ("StaticCtorTriggeredByMethodCall.TriggerStaticCtorMarking()", " Message for --StaticCtorTriggeredByMethodCall.TriggerStaticCtorMarking--.", ""),
+				VerifyCS.Diagnostic (RequiresUnreferencedCodeAnalyzer.RequiresUnreferencedCodeRule).WithSpan (21, 3, 21, 69).WithArguments ("StaticCtorTriggeredByMethodCall.TriggerStaticCtorMarking()", " Message for --StaticCtorTriggeredByMethodCall.TriggerStaticCtorMarking--.", ""),
 				// (21,3): warning IL2026: Using method 'StaticCtorTriggeredByMethodCall.StaticCtorTriggeredByMethodCall()' which has 'RequiresUnreferencedCodeAttribute' can break functionality when trimming application code. Message for --StaticCtorTriggeredByMethodCall.Cctor--.
-				VerifyCS.Diagnostic (Constants.WarningCodes.IL2026).WithSpan (21, 3, 21, 41).WithArguments ("StaticCtorTriggeredByMethodCall.StaticCtorTriggeredByMethodCall()", " Message for --StaticCtorTriggeredByMethodCall.Cctor--.", "")
+				VerifyCS.Diagnostic (RequiresUnreferencedCodeAnalyzer.RequiresUnreferencedCodeRule).WithSpan (21, 3, 21, 41).WithArguments ("StaticCtorTriggeredByMethodCall.StaticCtorTriggeredByMethodCall()", " Message for --StaticCtorTriggeredByMethodCall.Cctor--.", "")
 				);
 		}
 
@@ -529,7 +529,7 @@ class C
 }";
 			return VerifyRequiresUnreferencedCodeAnalyzer (TypeIsBeforeFieldInit,
 				// (8,29): warning IL2026: Using method 'C.TypeIsBeforeFieldInit.AnnotatedMethod()' which has 'RequiresUnreferencedCodeAttribute' can break functionality when trimming application code. Message from --TypeIsBeforeFieldInit.AnnotatedMethod--.
-				VerifyCS.Diagnostic (Constants.WarningCodes.IL2026).WithSpan (8, 29, 8, 47).WithArguments ("C.TypeIsBeforeFieldInit.AnnotatedMethod()", " Message from --TypeIsBeforeFieldInit.AnnotatedMethod--.", "")
+				VerifyCS.Diagnostic (RequiresUnreferencedCodeAnalyzer.RequiresUnreferencedCodeRule).WithSpan (8, 29, 8, 47).WithArguments ("C.TypeIsBeforeFieldInit.AnnotatedMethod()", " Message from --TypeIsBeforeFieldInit.AnnotatedMethod--.", "")
 				);
 		}
 
@@ -553,7 +553,7 @@ class C
 
 			return VerifyRequiresUnreferencedCodeAnalyzer (src,
 				// (6,50): warning IL2026: Using method 'C.InitC()' which has 'RequiresUnreferencedCodeAttribute' can break functionality when trimming application code. Message from --C.InitC--.
-				VerifyCS.Diagnostic (Constants.WarningCodes.IL2026).WithSpan (6, 50, 6, 55).WithArguments ("C.InitC()", " Message from --C.InitC--.", ""));
+				VerifyCS.Diagnostic (RequiresUnreferencedCodeAnalyzer.RequiresUnreferencedCodeRule).WithSpan (6, 50, 6, 55).WithArguments ("C.InitC()", " Message from --C.InitC--.", ""));
 		}
 
 		[Fact]
@@ -575,9 +575,9 @@ class C
 
 			return VerifyRequiresUnreferencedCodeAnalyzer (src,
 				// (10,20): warning IL2026: Using method 'C.M1()' which has 'RequiresUnreferencedCodeAttribute' can break functionality when trimming application code. Message from --C.M1--.
-				VerifyCS.Diagnostic (Constants.WarningCodes.IL2026).WithSpan (10, 20, 10, 22).WithArguments ("C.M1()", " Message from --C.M1--.", ""),
+				VerifyCS.Diagnostic (RequiresUnreferencedCodeAnalyzer.RequiresUnreferencedCodeRule).WithSpan (10, 20, 10, 22).WithArguments ("C.M1()", " Message from --C.M1--.", ""),
 				// (11,26): warning IL2026: Using method 'C.M1()' which has 'RequiresUnreferencedCodeAttribute' can break functionality when trimming application code. Message from --C.M1--.
-				VerifyCS.Diagnostic (Constants.WarningCodes.IL2026).WithSpan (11, 26, 11, 30).WithArguments ("C.M1()", " Message from --C.M1--.", ""));
+				VerifyCS.Diagnostic (RequiresUnreferencedCodeAnalyzer.RequiresUnreferencedCodeRule).WithSpan (11, 26, 11, 30).WithArguments ("C.M1()", " Message from --C.M1--.", ""));
 		}
 
 		[Fact]
@@ -859,6 +859,64 @@ class AnotherImplementation : IRAF
 				VerifyCS.Diagnostic (Constants.WarningCodes.IL2046).WithSpan (7, 14, 7, 20).WithArguments ("Member 'Implementation.Method()' with 'RequiresUnreferencedCodeAttribute' implements interface member 'IRAF.Method()' without 'RequiresUnreferencedCodeAttribute'"),
 				// (13,3): warning IL2046: Member 'Implementation.StringProperty.get' with 'RequiresUnreferencedCodeAttribute' implements interface member 'IRAF.StringProperty.get' without 'RequiresUnreferencedCodeAttribute'. Attributes must match across all interface implementations or overrides.
 				VerifyCS.Diagnostic (Constants.WarningCodes.IL2046).WithSpan (13, 3, 13, 6).WithArguments ("Member 'Implementation.StringProperty.get' with 'RequiresUnreferencedCodeAttribute' implements interface member 'IRAF.StringProperty.get' without 'RequiresUnreferencedCodeAttribute'"));
+		}
+
+		[Fact]
+		public Task InvocationOnDynamicType ()
+		{
+			var source = @"
+using System;
+
+class C
+{
+	static void M0 ()
+	{
+		dynamic dynamicField = ""Some string"";
+		Console.WriteLine (dynamicField);
+	}
+
+	static void M1 ()
+	{
+		MethodWithDynamicArgDoNothing (0);
+		MethodWithDynamicArgDoNothing (""Some string"");
+		MethodWithDynamicArg(-1);
+	}
+
+	static void MethodWithDynamicArgDoNothing (dynamic arg)
+	{
+	}
+
+	static void MethodWithDynamicArg (dynamic arg)
+	{
+		arg.MethodWithDynamicArg (arg);
+	}
+}";
+
+			return VerifyRequiresUnreferencedCodeAnalyzer (source,
+				// (10,3): warning IL2026: Invoking members on dynamic types is not trimming safe. Types or member might have been removed by the trimmer.
+				VerifyCS.Diagnostic (RequiresUnreferencedCodeAnalyzer.DynamicTypeInvocationRule).WithSpan (9, 3, 9, 35),
+				// (26,3): warning IL2026: Invoking members on dynamic types is not trimming safe. Types or member might have been removed by the trimmer.
+				VerifyCS.Diagnostic (RequiresUnreferencedCodeAnalyzer.DynamicTypeInvocationRule).WithSpan (25, 3, 25, 33));
+		}
+
+		[Fact]
+		public Task InvocationOnDynamicTypeInMethodWithRUCDoesNotWarnTwoTimes ()
+		{
+			var source = @"
+using System;
+using System.Diagnostics.CodeAnalysis;
+
+class C
+{
+	[RequiresUnreferencedCode (""We should only see the warning related to this annotation, and none about the dynamic type."")]
+	static void M0 ()
+	{
+		dynamic dynamicField = ""Some string"";
+		Console.WriteLine (dynamicField);
+	}
+}";
+
+			return VerifyRequiresUnreferencedCodeAnalyzer (source);
 		}
 	}
 }

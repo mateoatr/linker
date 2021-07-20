@@ -28,7 +28,7 @@ namespace ILLink.RoslynAnalyzer
 				: null;
 		}
 
-		public static bool MSBuildPropertyValueIsTrue (
+		public static bool IsMSBuildPropertyValueTrue (
 			this AnalyzerOptions options,
 			string propertyName,
 			Compilation compilation)

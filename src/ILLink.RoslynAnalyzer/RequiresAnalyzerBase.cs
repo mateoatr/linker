@@ -24,6 +24,8 @@ namespace ILLink.RoslynAnalyzer
 
 		private protected abstract DiagnosticDescriptor RequiresAttributeMismatch { get; }
 
+		private protected abstract ImmutableArray<(Action<OperationAnalysisContext> Action, OperationKind[] OperationKind)> ExtraOperationActions { get; }
+
 		public override void Initialize (AnalysisContext context)
 		{
 			context.EnableConcurrentExecution ();
@@ -111,6 +113,10 @@ namespace ILLink.RoslynAnalyzer
 						return;
 					CheckCalledMember (operationContext, methodSymbol, incompatibleMembers);
 				}, OperationKind.DelegateCreation);
+
+				// Register any extra operation actions supported by the analyzer.
+				foreach (var extraOperationAction in ExtraOperationActions)
+					context.RegisterOperationAction (extraOperationAction.Action, extraOperationAction.OperationKind);
 
 				void CheckStaticConstructors (OperationAnalysisContext operationContext,
 					ImmutableArray<IMethodSymbol> staticConstructors)
