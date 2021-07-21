@@ -24,7 +24,7 @@ namespace ILLink.RoslynAnalyzer
 
 		private protected abstract DiagnosticDescriptor RequiresAttributeMismatch { get; }
 
-		private protected abstract ImmutableArray<(Action<OperationAnalysisContext> Action, OperationKind[] OperationKind)> ExtraOperationActions { get; }
+		private protected virtual ImmutableArray<(Action<OperationAnalysisContext> Action, OperationKind[] OperationKind)> ExtraOperationActions { get; } = ImmutableArray<(Action<OperationAnalysisContext> Action, OperationKind[] OperationKind)>.Empty;
 
 		public override void Initialize (AnalysisContext context)
 		{
@@ -139,9 +139,8 @@ namespace ILLink.RoslynAnalyzer
 						return;
 
 					// Check also for RequiresAttribute in the associated symbol
-					if (containingSymbol is IMethodSymbol methodSymbol &&
-						methodSymbol.AssociatedSymbol is not null &&
-						methodSymbol.AssociatedSymbol!.HasAttribute (RequiresAttributeName))
+					if (containingSymbol is IMethodSymbol { AssociatedSymbol: { } associatedSymbol } &&
+						associatedSymbol.HasAttribute (RequiresAttributeName))
 						return;
 
 					// If calling an instance constructor, check first for any static constructor since it will be called implicitly
